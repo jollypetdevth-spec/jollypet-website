@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Prompt, Sarabun } from "next/font/google";
 import "./globals.css";
+import SessionProvider from "@/components/providers/SessionProvider";
 
 const prompt = Prompt({
   subsets: ["thai", "latin"],
@@ -24,10 +25,15 @@ export const metadata: Metadata = {
   description:
     "ผลิตภัณฑ์อาหาร ขนม และผลิตภัณฑ์ดูแลสัตว์เลี้ยงคุณภาพสูง จากบริษัท จอลลี่ เพ็ท จำกัด",
   keywords: ["jolly pet", "จอลลี่ เพ็ท", "อาหารสัตว์เลี้ยง", "ขนมสุนัข", "สินค้าสัตว์เลี้ยง"],
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
   openGraph: {
     type: "website",
     locale: "th_TH",
     siteName: "Jolly Pet",
+    images: [{ url: "/logo.svg", width: 500, height: 380, alt: "Jolly Pet" }],
   },
 };
 
@@ -39,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="th" className={`${prompt.variable} ${sarabun.variable}`}>
       <body className="font-body bg-white text-gray-900 antialiased">
-        {children}
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );

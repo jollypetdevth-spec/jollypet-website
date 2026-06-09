@@ -8,7 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const productUrls = products.map((p) => ({
     url: `${BASE_URL}/products/${p.slug}`,
-    lastModified: new Date(p.updated_at),
+    lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }));

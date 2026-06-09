@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Product } from "@/types";
 import { categoryBg, categoryEmoji } from "@/lib/data/products";
 
@@ -12,13 +13,27 @@ export default function ProductCard({ product, showWholesale = false }: ProductC
   const bg = categoryBg[categorySlug] ?? "bg-gray-50";
   const emoji = categoryEmoji[categorySlug] ?? "📦";
 
+  const primaryImage = product.images?.find((img) => img.is_primary) ?? product.images?.[0];
+
   return (
-    <Link href={`/products/${product.slug}`} className="group">
+    <Link href={`/products/${encodeURIComponent(product.slug)}`} className="group">
       <div className="card h-full flex flex-col">
-        {/* Image placeholder */}
-        <div className={`${bg} aspect-square flex items-center justify-center text-5xl`}>
-          {emoji}
-        </div>
+        {/* Image */}
+        {primaryImage ? (
+          <div className="relative aspect-square overflow-hidden rounded-t-xl bg-gray-50">
+            <Image
+              src={primaryImage.url}
+              alt={primaryImage.alt_text ?? product.name}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            />
+          </div>
+        ) : (
+          <div className={`${bg} aspect-square flex items-center justify-center text-5xl rounded-t-xl`}>
+            {emoji}
+          </div>
+        )}
 
         {/* Content */}
         <div className="p-4 flex flex-col flex-1">

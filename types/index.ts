@@ -59,32 +59,52 @@ export interface Category {
 // --- Product ---
 export interface Product {
   id: string;
-  category_id: string;
+  category_id?: string;
   name: string;
   slug: string;
-  description: string | null;
+  description?: string | null;
   short_description: string | null;
-  sku: string | null;
-  barcode: string | null;
+  sku?: string | null;
+  barcode?: string | null;
   retail_price: number;
   wholesale_price: number | null;
-  min_wholesale_qty: number;
+  cost_price?: number | null;
+  min_wholesale_qty?: number;
   weight_grams: number | null;
   stock_qty: number;
   low_stock_alert: number;
-  is_active: boolean;
-  is_featured: boolean;
+  is_active?: boolean;
+  is_featured?: boolean;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  created_at?: string;
+  updated_at?: string;
   category?: Category;
   images?: ProductImage[];
+  variants?: ProductVariant[];
 }
 
 export interface ProductImage {
-  id: string;
-  product_id: string;
+  id?: string;
+  product_id?: string;
   url: string;
-  alt_text: string | null;
+  alt_text?: string | null;
   sort_order: number;
   is_primary: boolean;
+}
+
+export interface ProductVariant {
+  id?: string;
+  product_id?: string;
+  name: string;                        // "รสนม", "รสเนื้อย่าง", "360ml" ฯลฯ
+  sku?: string | null;
+  barcode?: string | null;
+  retail_price?: number | null;        // null = ใช้ราคาจาก product
+  wholesale_price?: number | null;     // null = ใช้ราคาจาก product
+  stock_qty: number;
+  image_url?: string | null;
+  sort_order: number;
+  is_active?: boolean;
 }
 
 // --- Cart ---

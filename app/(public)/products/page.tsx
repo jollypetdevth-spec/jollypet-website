@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ProductCard from "@/components/product/ProductCard";
-import { categories, getAllProducts, getProductsByCategory } from "@/lib/data/products";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+
+type CategoryRow = { id: string; name: string; slug: string };
+type ProductRow = {
+  id: string; name: string; slug: string; short_description: string | null;
+  retail_price: number; wholesale_price: number | null; weight_grams: number | null;
+  stock_qty: number; low_stock_alert: number; is_featured: boolean;
+  categories: CategoryRow | null;
+  product_images: { url: string; is_primary: boolean; sort_order: number }[];
+};
 
 export const metadata: Metadata = {
   title: "สินค้าทั้งหมด",
@@ -15,20 +24,44 @@ interface ProductsPageProps {
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const { category, q } = await searchParams;
   const activeCategory = category ?? "all";
-  const searchQuery = (q ?? "").toLowerCase();
+  const searchQuery = q ?? "";
 
-  let products =
-    activeCategory === "all"
-      ? getAllProducts()
-      : getProductsByCategory(activeCategory);
+  const supabase = createServerSupabaseClient();
+
+  // Fetch categories
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("id, name, slug")
+    .eq("is_active", true)
+    .order("sort_order") as { data: CategoryRow[] | null };
+
+  // Fetch products
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let query = (supabase as any)
+    .from("products")
+    .select(`
+      id, name, slug, short_description,
+      retail_price, wholesale_price, weight_grams,
+      stock_qty, low_stock_alert, is_featured,
+      categories (id, name, slug),
+      product_images (url, is_primary, sort_order)
+    `)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
+  if (activeCategory !== "all") {
+    // Join via categories slug
+    const cat = categories?.find((c) => c.slug === activeCategory);
+    if (cat) query = query.eq("category_id", cat.id);
+  }
 
   if (searchQuery) {
-    products = products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(searchQuery) ||
-        (p.short_description ?? "").toLowerCase().includes(searchQuery)
-    );
+    query = query.ilike("name", `%${searchQuery}%`);
   }
+
+  const { data: products } = await query as { data: ProductRow[] | null };
+
+  const activeCategoryName = categories?.find((c) => c.slug === activeCategory)?.name;
 
   return (
     <>
@@ -37,8 +70,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <div className="max-w-7xl mx-auto">
           <h1 className="font-heading font-bold text-3xl md:text-4xl mb-2">สินค้าทั้งหมด</h1>
           <p className="font-body text-gray-300">
-            {products.length} รายการ
-            {activeCategory !== "all" && ` ในหมวด ${categories.find((c) => c.slug === activeCategory)?.name}`}
+            {products?.length ?? 0} รายการ
+            {activeCategory !== "all" && activeCategoryName && ` ในหมวด ${activeCategoryName}`}
           </p>
         </div>
       </section>
@@ -59,7 +92,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               >
                 ทั้งหมด
               </Link>
-              {categories.map((cat) => (
+              {categories?.map((cat) => (
                 <Link
                   key={cat.slug}
                   href={`/products?category=${cat.slug}`}
@@ -86,14 +119,24 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               {activeCategory !== "all" && (
                 <input type="hidden" name="category" value={activeCategory} />
               )}
+              <button type="submit" className="btn-secondary px-4">ค้นหา</button>
             </form>
           </div>
 
           {/* Product Grid */}
-          {products.length > 0 ? (
+          {products && products.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard
+                  key={product.id}
+                  product={{
+                    ...product,
+                    category: Array.isArray(product.categories)
+                      ? product.categories[0]
+                      : product.categories ?? undefined,
+                    images: product.product_images ?? [],
+                  }}
+                />
               ))}
             </div>
           ) : (

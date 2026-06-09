@@ -1,7 +1,17 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import ProductCard from "@/components/product/ProductCard";
-import { getFeaturedProducts, categories, categoryEmoji } from "@/lib/data/products";
+import { categoryEmoji } from "@/lib/data/products";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+
+type CategoryRow = { id: string; name: string; slug: string; description?: string | null };
+type FeaturedProductRow = {
+  id: string; name: string; slug: string; short_description: string | null;
+  retail_price: number; wholesale_price: number | null; weight_grams: number | null;
+  stock_qty: number; low_stock_alert: number;
+  categories: CategoryRow | null;
+  product_images: { url: string; is_primary: boolean; sort_order: number }[];
+};
 
 export const metadata: Metadata = {
   title: "Jolly Pet — วัตถุดิบชั้นดี อร่อยง่าย ไม่เค็ม",
@@ -21,8 +31,25 @@ const trustItems = [
   { icon: "🐾", title: "Pet Safe", desc: "ปลอดภัยต่อสัตว์เลี้ยงทุกวัย" },
 ];
 
-export default function HomePage() {
-  const featured = getFeaturedProducts();
+export default async function HomePage() {
+  const supabase = createServerSupabaseClient();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const [featuredRes, categoriesRes] = await Promise.all([
+    sb.from("products")
+      .select(`id, name, slug, short_description, retail_price, wholesale_price, weight_grams, stock_qty, low_stock_alert, categories (id, name, slug), product_images (url, is_primary, sort_order)`)
+      .eq("is_active", true)
+      .eq("is_featured", true)
+      .order("created_at", { ascending: false })
+      .limit(8) as Promise<{ data: FeaturedProductRow[] | null }>,
+    sb.from("categories")
+      .select("id, name, slug, description")
+      .eq("is_active", true)
+      .order("sort_order") as Promise<{ data: CategoryRow[] | null }>,
+  ]);
+  const featured = featuredRes.data;
+  const categories = categoriesRes.data;
 
   return (
     <>
@@ -60,7 +87,7 @@ export default function HomePage() {
             <p className="font-body text-gray-500 mt-2">ครบครันทุกความต้องการของสัตว์เลี้ยงคุณ</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {categories.map((cat) => (
+            {(categories ?? []).map((cat) => (
               <Link
                 key={cat.id}
                 href={`/products?category=${cat.slug}`}
@@ -92,11 +119,27 @@ export default function HomePage() {
               ดูทั้งหมด
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {featured.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {featured && featured.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {featured.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={{
+                    ...product,
+                    category: Array.isArray(product.categories)
+                      ? product.categories[0]
+                      : product.categories ?? undefined,
+                    images: product.product_images ?? [],
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-400 font-body">
+              ยังไม่มีสินค้าแนะนำ —{" "}
+              <Link href="/admin/products" className="text-jolly-navy underline">เพิ่มสินค้าแนะนำใน Admin</Link>
+            </div>
+          )}
           <div className="text-center mt-8 sm:hidden">
             <Link href="/products" className="btn-outline">
               ดูสินค้าทั้งหมด

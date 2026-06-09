@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 380">
+  <!-- Background transparent -->
+
+  <!-- ═══ JOLLY row ═══ -->
+  <!-- J -->
+  <text x="10" y="185"
+    font-family="'Arial Rounded MT Bold','Nunito','Varela Round',Arial,sans-serif"
+    font-weight="900" font-size="185" fill="#FFC200">J</text>
+
+  <!-- o replaced by paw circle — centered around x=175 -->
+  <circle cx="178" cy="108" r="64" fill="#1B3664"/>
+  <!-- Paw: 3 toe pads -->
+  <ellipse cx="155" cy="84" rx="12" ry="14" fill="white"/>
+  <ellipse cx="178" cy="75" rx="12" ry="13" fill="white"/>
+  <ellipse cx="201" cy="84" rx="12" ry="14" fill="white"/>
+  <!-- Paw: main pad -->
+  <ellipse cx="178" cy="118" rx="24" ry="20" fill="white"/>
+  <!-- Heart inside main pad -->
+  <path d="M170 116 C170 112 174 109 178 112 C182 109 186 112 186 116 C186 120 178 126 178 126 C178 126 170 120 170 116Z" fill="#1B3664"/>
+
+  <!-- lly -->
+  <text x="238" y="185"
+    font-family="'Arial Rounded MT Bold','Nunito','Varela Round',Arial,sans-serif"
+    font-weight="900" font-size="185" fill="#FFC200">lly</text>
+
+  <!-- ═══ Pet row ═══ -->
+  <text x="82" y="335"
+    font-family="'Arial Rounded MT Bold','Nunito','Varela Round',Arial,sans-serif"
+    font-weight="900" font-size="165" fill="#FFC200">Pet</text>
+</svg>

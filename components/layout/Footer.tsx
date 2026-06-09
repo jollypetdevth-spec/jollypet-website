@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer className="bg-jolly-navy text-white">
@@ -5,9 +7,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <h3 className="font-heading font-bold text-jolly-yellow text-lg mb-3">
-              Jolly Pet
-            </h3>
+            <Image
+              src="/logo.svg"
+              alt="Jolly Pet"
+              width={120}
+              height={68}
+              className="h-16 w-auto mb-3"
+            />
             <p className="font-body text-gray-300 text-sm leading-relaxed">
               วัตถุดิบชั้นดี อร่อยง่าย ไม่เค็ม
               <br />
@@ -32,8 +38,13 @@ export default function Footer() {
               <li>72/93 หมู่ที่ 5 ต.บึงคำพรอย</li>
               <li>อ.ลำลูกกา จ.ปทุมธานี 12150</li>
               <li className="pt-1">
-                <a href="mailto:info@jollypet.co.th" className="hover:text-jolly-yellow transition-colors">
-                  info@jollypet.co.th
+                <a href="tel:0993246629" className="hover:text-jolly-yellow transition-colors">
+                  099-324-6629 (นก)
+                </a>
+              </li>
+              <li>
+                <a href="mailto:jollypet.hq@gmail.com" className="hover:text-jolly-yellow transition-colors">
+                  jollypet.hq@gmail.com
                 </a>
               </li>
             </ul>

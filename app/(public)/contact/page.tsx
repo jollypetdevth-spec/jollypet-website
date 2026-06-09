@@ -7,7 +7,8 @@ export const metadata: Metadata = {
 
 const contactItems = [
   { icon: "📍", label: "ที่อยู่", value: "72/93 หมู่ที่ 5 ต.บึงคำพรอย อ.ลำลูกกา จ.ปทุมธานี 12150" },
-  { icon: "📧", label: "อีเมล", value: "info@jollypet.co.th" },
+  { icon: "📞", label: "ติดต่อ", value: "ณฐอร เลาหกุล (นก) 099-324-6629" },
+  { icon: "📧", label: "อีเมล", value: "jollypet.hq@gmail.com" },
   { icon: "⏰", label: "เวลาทำการ", value: "จันทร์–ศุกร์ 9:00–18:00 น." },
 ];
 

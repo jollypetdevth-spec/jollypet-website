@@ -36,7 +36,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           .from("users")
           .select("id, full_name, email, user_type, is_approved")
           .eq("id", data.user.id)
-          .single();
+          .single<{
+            id: string;
+            full_name: string;
+            email: string;
+            user_type: string;
+            is_approved: boolean;
+          }>();
 
         if (!profile) return null;
 
