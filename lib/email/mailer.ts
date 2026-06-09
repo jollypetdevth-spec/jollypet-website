@@ -1,7 +1,8 @@
-import nodemailer from "nodemailer";
+import { createTransport } from "nodemailer";
+import type { Attachment } from "nodemailer/lib/mailer";
 
 // Gmail SMTP transporter
-const transporter = nodemailer.createTransport({
+const transporter = createTransport({
   service: "gmail",
   auth: {
     user: process.env.GMAIL_USER,
@@ -13,7 +14,7 @@ interface SendEmailOptions {
   to: string;
   subject: string;
   html: string;
-  attachments?: nodemailer.Attachment[];
+  attachments?: Attachment[];
 }
 
 export async function sendEmail({ to, subject, html, attachments }: SendEmailOptions) {
